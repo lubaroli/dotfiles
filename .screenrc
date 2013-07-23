@@ -1,0 +1,110 @@
+# GNU Screen configuration file
+#
+# Notes
+# -----
+# 1. To change the colors of the hardstatus line, change this line: 
+#       sorendition "+b +kG"  
+#    Example: blue (+b) highlight with black text (k) on a green background (G)
+#    Example: sorendition "+r +kG"  is red highlighting with black text on a green background
+#
+#  Modification of original file by Balaji S. Srinivasan <balajis@stanford.edu> which was
+#  in it's turn based on Sven Guckes, Sarunas Vancevicius, and Mike Perry 
+#  Sarunas Vancevicius original: http://www.redbrick.dcu.ie/~svan/configs/screenrc
+#  Mike Perry original:  http://fscked.org/writings/225notes/unix/.screenrc
+
+## -----------------------------------------------------------------------------------------
+## -- 1) Set variables and keybindings
+## -----------------------------------------------------------------------------------------
+autodetach            on              # default: on
+crlf                  off             # default: off
+hardcopy_append       on              # default: off
+startup_message       off             # default: on
+vbell                 off             # default: ???
+defutf8               on              # unicode by default
+defscrollback         10000           # default: 100
+silencewait           15              # default: 30
+altscreen             on              # full-screen programs (less, Vim) cleared once quit
+activity              "activity in %n (%t) [%w:%s]~"
+bell                  "bell     in %n (%t) [%w:%s]~"
+escape                "^Tt"           # set the action command to C-T to allow C-a for bash
+## -------------------------------------------------------------------------------------------------
+## -- 2) Hardstatus line (aka navigation bar at bottom) 
+##       and sorendition (aka color scheme for navigation bar)
+## -------------------------------------------------------------------------------------------------
+
+# 2.1) sorendition = color scheme
+#      Set the colors for the "messages" and "text marking"
+#      Example: "+b kG" = blue screen, black text, green background. Change
+#      to "+b kR" and so on to distinguish machines.
+sorendition "+b kG"   
+
+# 2.2) hardstatus = navigation bar @ bottom
+hardstatus alwayslastline "%H %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"  
+hardstatus alwayslastline "%{= wk} %-w%{=b bw}%n %t%{-}%+w %= %{= wb}%y/%m/%d %c "
+
+# 2.3) Autoload three screen tabs, set top screen for vim/bash and h-split bottom for REPL.
+screen -t vim 0
+screen -t bash 1
+screen -t REPL 2
+sessionname devel
+layout new
+select 0
+split
+resize -v +8
+focus down
+select 2
+focus up
+
+
+# 2.4) Defines "resize mode" mapped to C-r. Resize regions with hjkl, toggle focus with Tab and arrows.
+bind r eval "command -c rs" # enters resize mode
+bind -c rs h eval "resize -h -1" "command -c rs" # h - decreases height
+bind -c rs j eval "resize -v -1" "command -c rs" # j - decreases width
+bind -c rs k eval "resize -v +1" "command -c rs" # k - increases height
+bind -c rs l eval "resize -h +1" "command -c rs" # l - increases width
+# bind -c rs \t eval "focus" "command -c rs" # tab - alternate focus
+bind -c rs -k kl eval "focus left" "command -c rs" # left - focus left
+bind -c rs -k kr eval "focus right" "command -c rs" # right - focus right
+bind -c rs -k ku eval "focus up" "command -c rs" # up - focus upwards
+bind -c rs -k kd eval "focus down" "command -c rs" # down - focus downward
+
+# 2.5) Description of the keywords used in hardstatus
+# caption always "%?%F%{-b bc}%:%{-b bb}%?%C|%D|%M %d|%H%?%F%{+u wb}%? %L=%-Lw%45>%{+b by}%n%f* %t%{-}%+Lw%-0<"
+# 
+# Anything I don't describe is treated literally.
+# 
+# %?          - Start of a conditional statement.
+# %F          - Use this part of the statement if the window has focus (i.e. it
+#               is the only window or the currently active one).
+# %{-b bc}    - Turn off bold, blue foreground, cyan background.
+# %:          - else
+# %{-b bb}    - Turn off bold, blue foreground, blue background (this obscures
+#               the text on non-focused windows and just gives a blue line).
+# %?          - End conditional statement.
+# %C          - time (hh:mm, leading space) in 12 hour format
+# %D          - Three-letter day-of-week appreviation
+# %M          - Three-letter month appreviation
+# %d          - Day of the month
+# %H          - hostname
+# %?          - Start of conditional statement.
+# %F          - Use this part of the statement if the window has focus.
+# %{+u wb}    - underlined, white foreground, blue background
+# %?          - End conditional (if not focused, text remaind blue on blue).
+# %L=         - truncation/padding point.  With the 'L' qualifier, basically
+#               just acts as a reference point.  Further truncation/padding is
+#               done relative to here, not the beginning of the string
+# %-Lw        - window list up to but not including the current window (-),
+#               show window flags (L)
+# %45>        - truncation/padding marker; place this point about 45% of the
+#               way into the display area (45)
+# %{+b by}    - add bold (still underlined from before), blue foreground,
+#               yellow background
+# %n          - number of the current window
+# %f          - flags for current window
+# %t          - title of current window
+# %{-}        - undo last color change (so now we're back to underlined white
+#               on blue)  (technically, this is a pop; a second invocation
+#               would drop things back to unadorned blue on cyan)
+# %+Lw        - window list from the next window on (-), show window flags (L)
+# %-0<        - truncation/padding point.  Place this point zero spaces (0)
+#               from the right margin (-).
