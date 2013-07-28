@@ -1,5 +1,6 @@
 # .bashrc file
-# By Balaji S. Srinivasan (balajis@stanford.edu)
+# By Balaji S. Srinivasan (balajis@stanford.edu), modified by Lucas Barcelos 
+# (lucas.barcelos@gmail.com) for personal use.
 #
 # Concepts:
 #
@@ -7,8 +8,6 @@
 #        first connection.
 #    2) .bash_profile is the *login* config for bash, launched upon first connection.
 #    3) .bash_profile imports .bashrc, but not vice versa.
-#    4) .bashrc imports .bashrc_custom, which can be used to override
-#        variables specified here.
 #           
 # When using GNU screen:
 #
@@ -216,10 +215,3 @@ if [ -s ~/.nvm/nvm.sh ]; then
     source ~/.nvm/nvm.sh
     nvm use v0.10.12 &> /dev/null # silence nvm use; needed for rsync
 fi
-
-## ------------------------------
-## -- 3) User-customized code  --
-## ------------------------------
-
-## Define any user-specific variables you want here.
-source ~/.bashrc_custom

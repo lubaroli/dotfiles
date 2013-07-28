@@ -15,6 +15,8 @@
 ## -----------------------------------------------------------------------------------------
 ## -- 1) Set variables and keybindings
 ## -----------------------------------------------------------------------------------------
+
+# 1.1) Change environment variables
 autodetach            on              # default: on
 crlf                  off             # default: off
 hardcopy_append       on              # default: off
@@ -27,6 +29,18 @@ altscreen             on              # full-screen programs (less, Vim) cleared
 activity              "activity in %n (%t) [%w:%s]~"
 bell                  "bell     in %n (%t) [%w:%s]~"
 escape                "^Tt"           # set the action command to C-T to allow C-a for bash
+
+# 1.2) Vim compatibility for screen movement (if you use subscreen regions)
+# Using tab to move around regions gets annoying. These help.
+# bind ^P focus up
+bind 'p' focus up
+# bind ^N focus down
+bind 'n' focus down
+# bind ^F focus top
+bind 'f' focus top
+# bind ^B focus bottom
+bind 'b' focus bottom
+
 ## -------------------------------------------------------------------------------------------------
 ## -- 2) Hardstatus line (aka navigation bar at bottom) 
 ##       and sorendition (aka color scheme for navigation bar)
@@ -39,36 +53,10 @@ escape                "^Tt"           # set the action command to C-T to allow C
 sorendition "+b kG"   
 
 # 2.2) hardstatus = navigation bar @ bottom
-hardstatus alwayslastline "%H %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"  
-hardstatus alwayslastline "%{= wk} %-w%{=b bw}%n %t%{-}%+w %= %{= wb}%y/%m/%d %c "
+# hardstatus alwayslastline "%H %-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%< %= %y/%m/%d %c "  
+hardstatus alwayslastline "%{= kG} %-w%{=b kW}%n %t%{-}%+w %= %{= kG}%y/%m/%d %c "
 
-# 2.3) Autoload three screen tabs, set top screen for vim/bash and h-split bottom for REPL.
-screen -t vim 0
-screen -t bash 1
-screen -t REPL 2
-sessionname devel
-layout new
-select 0
-split
-resize -v +8
-focus down
-select 2
-focus up
-
-
-# 2.4) Defines "resize mode" mapped to C-r. Resize regions with hjkl, toggle focus with Tab and arrows.
-bind r eval "command -c rs" # enters resize mode
-bind -c rs h eval "resize -h -1" "command -c rs" # h - decreases height
-bind -c rs j eval "resize -v -1" "command -c rs" # j - decreases width
-bind -c rs k eval "resize -v +1" "command -c rs" # k - increases height
-bind -c rs l eval "resize -h +1" "command -c rs" # l - increases width
-# bind -c rs \t eval "focus" "command -c rs" # tab - alternate focus
-bind -c rs -k kl eval "focus left" "command -c rs" # left - focus left
-bind -c rs -k kr eval "focus right" "command -c rs" # right - focus right
-bind -c rs -k ku eval "focus up" "command -c rs" # up - focus upwards
-bind -c rs -k kd eval "focus down" "command -c rs" # down - focus downward
-
-# 2.5) Description of the keywords used in hardstatus
+# 2.3) Description of the keywords used in hardstatus
 # caption always "%?%F%{-b bc}%:%{-b bb}%?%C|%D|%M %d|%H%?%F%{+u wb}%? %L=%-Lw%45>%{+b by}%n%f* %t%{-}%+Lw%-0<"
 # 
 # Anything I don't describe is treated literally.
@@ -108,3 +96,34 @@ bind -c rs -k kd eval "focus down" "command -c rs" # down - focus downward
 # %+Lw        - window list from the next window on (-), show window flags (L)
 # %-0<        - truncation/padding point.  Place this point zero spaces (0)
 #               from the right margin (-).
+
+## -------------------------------------------------------------------------------------------------
+## -- 3) Screen layouts and resize mode
+## -------------------------------------------------------------------------------------------------
+
+# 3.1) Autoload three screens, split window in two regions, set top screen for vim/bash and 
+# bottom for REPL.
+screen -t vim 0
+screen -t bash 1
+screen -t REPL 2
+sessionname devel
+layout new
+select 0
+split
+resize -v +8
+clear
+focus down
+select 2
+focus up
+
+# 3.2) Defines "resize mode" mapped to C-r. Resize regions with hjkl, toggle focus with Tab and arrows.
+bind r eval "command -c rs" # enters resize mode
+bind -c rs h eval "resize -h -1" "command -c rs" # h - decreases height
+bind -c rs j eval "resize -v -1" "command -c rs" # j - decreases width
+bind -c rs k eval "resize -v +1" "command -c rs" # k - increases height
+bind -c rs l eval "resize -h +1" "command -c rs" # l - increases width
+# bind -c rs \t eval "focus" "command -c rs" # tab - alternate focus
+bind -c rs -k kl eval "focus left" "command -c rs" # left - focus left
+bind -c rs -k kr eval "focus right" "command -c rs" # right - focus right
+bind -c rs -k ku eval "focus up" "command -c rs" # up - focus upwards
+bind -c rs -k kd eval "focus down" "command -c rs" # down - focus downward
