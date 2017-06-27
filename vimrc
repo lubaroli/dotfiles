@@ -1,6 +1,8 @@
 scriptencoding utf8
 
-" Bundle settings.
+"------------------------------------------------------------------------------
+" Plugins {
+
 filetype off
 
 call plug#begin('~/.local/share/nvim/bundle/') 
@@ -49,7 +51,11 @@ Plug 'justinmk/vim-sneak'
 
 call plug#end()  
 
-" Color Scheme configuration.
+" }
+
+"------------------------------------------------------------------------------
+" Color Scheme configuration {
+
 set background=dark
 colorscheme gruvbox
 let g:airline_theme='gruvbox'
@@ -57,28 +63,20 @@ if has('nvim')
     set termguicolors
 endif
 
-"----------------------------------------------------------------------
-" General config
-"
-filetype indent on      " Allow indent for know filetypes.
+" }
+
+"------------------------------------------------------------------------------
+" General config {
+
 filetype plugin on      " Allow filespecific plugins.
-syntax on               " Enable syntax highlighting.
-set showcmd             " Show (partial) command in status line.
-set showmatch           " Show matching brackets.
-set showmode            " Show current mode.
-set ruler               " Show the line and column numbers of the cursor.
-set number              " Show the line numbers on the left side.
-set formatoptions+=o    " Continue comment marker in new lines.
-set textwidth=0         " Hard-wrap long lines as you type them.
-set expandtab           " Insert spaces when TAB is pressed.
 set wildmenu            " Better command-line completion.
 set laststatus=2        " Always display the status line .
 set mouse=a             " Enable use of the mouse for all modes.
-set autoindent          " Keeps the same line ident for generic file types.
 set ignorecase          " Make searching case insensitive.
 set smartcase           " ...unless the query has capital letters.
 set visualbell          " Use visual bell instead of beeping.
 set autochdir           " Switch to current file's parent directory.
+set ttimeout=10         " Set insermode timeout to 10ms.
 
 if &undolevels < 200
     set undolevels=200  " Number of undo levels.
@@ -98,15 +96,27 @@ set hidden
 " Allow backspacing over autoindent, line breaks and start of insert.
 set backspace=indent,eol,start
 
-"----------------------------------------------------------------------
-" Indentation options
+" }
 
-" Indentation settings for using 4 spaces instead of tabs.
-" Do not change 'tabstop' from its default value of 8 with this setup.
-set shiftwidth=4 tabstop=4 expandtab
+"------------------------------------------------------------------------------
+" Formatting options {
 
-"------------------------------------------------------------
-" Mappings
+syntax on               " Enable syntax highlighting.
+filetype indent on      " Allow indent for know filetypes.
+set autoindent          " Keeps the same line ident for generic file types.
+set showmatch           " Show matching brackets.
+set number              " Show the line numbers on the left side.
+set formatoptions+=o    " Continue comment marker in new lines.
+set expandtab           " Insert spaces when TAB is pressed.
+set tabstop=4           " Render TABs using this many spaces.
+set shiftwidth=4        " Indentation amount for < and > commands.
+set nojoinspaces        " Prevents two spaces after punctuation on a join (J)
+set splitbelow          " Horizontal split below current. More natural splits.
+
+" }
+
+"------------------------------------------------------------------------------
+" Mappings {
 
 " Map the leader key to SPACE.
 let mapleader="\<SPACE>"
@@ -147,18 +157,22 @@ nmap <silent> ˙ :wincmd h<CR>
 nmap <silent> ¬ :wincmd l<CR>
 
 " Remap <C-c> and <C-v> to copy/paste to/from clipboard.
-nnoremap <C-c> "+y
 vnoremap <C-c> "+y
-nnoremap <C-v> "+gP
-vnoremap <C-v> "+gP
+vnoremap <C-x> "+d
+nnoremap <C-V> "+P
+vnoremap <C-V> "+P
+nnoremap <C-v> "+p
+vnoremap <C-v> "+p
 
 " Clear search highlight after search.
 nnoremap <C-L> :nohlsearch<CR><C-L>
 
-"----------------------------------------------------------------------
-" Plugin specific options
+" }
 
-" Deoplete {
+"----------------------------------------------------------------------
+" Plugin specific options {
+
+" Deoplete
 " " Enable deoplete at startup.
 " let g:deoplete#enable_at_startup = 1
 
@@ -167,36 +181,32 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
 
 " " Deoplete mappings.
 " inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
-" }
 
-" NERDTree {
+" NERDTree
     map <Leader>t :NERDTreeToggle<CR>
-" }
 
-" Ctrl-P {
+" Ctrl-P
     " Open file menu.
     nnoremap <Leader>o :CtrlP<CR>
     " Open buffer menu.
     nnoremap <Leader>b :CtrlPBuffer<CR>
     " Open most recently used files.
     nnoremap <Leader>f :CtrlPMRUFiles<CR>
-" }
 
-" Jedi {
+" Jedi
     " Force Jedi to use Python3.
     let g:jedi#force_py_version = 3
     let g:jedi#auto_close_doc = 1
     " Select candidate with <CR>.
     inoremap <expr> <silent> <CR> pumvisible() ? "<C-y>" : "<CR>"
-" }
 
-" SuperTab {
+" SuperTab
     " Let SuperTab scroll from top to bottom.
     let g:SuperTabDefaultCompletionType = "<c-n>"
-" }
 
-" Airline {
+" Airline
     let g:airline#extensions#ale = 1
+    let g:airline_powerline_fonts = 1 
     let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#tabline#buffer_idx_mode = 1
     let g:airline#extensions#tabline#fnamemod = ':t'
@@ -209,9 +219,9 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
     let g:airline_right_sep = ''
     let g:airline_right_alt_sep = ''
     let g:airline_theme= 'gruvbox'
-" }
 
 " ALE {
     let g:ale_sign_column_always = 1
+" }
 " }
 "----------------------------------------------------------------------
