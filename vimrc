@@ -35,6 +35,8 @@ Plug 'w0rp/ale'
 " Code snippets.
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
+Plug 'Vimjas/vim-python-pep8-indent', {'for': ['python', 'python3']}
+Plug 'jiangmiao/auto-pairs'
 
 " Version control tools.
 Plug 'tpope/vim-fugitive'
@@ -76,7 +78,7 @@ set ignorecase          " Make searching case insensitive.
 set smartcase           " ...unless the query has capital letters.
 set visualbell          " Use visual bell instead of beeping.
 set autochdir           " Switch to current file's parent directory.
-set ttimeout=10         " Set insermode timeout to 10ms.
+let ttimeout=10         " Set insermode timeout to 10ms.
 
 if &undolevels < 200
     set undolevels=200  " Number of undo levels.
@@ -120,6 +122,9 @@ set splitbelow          " Horizontal split below current. More natural splits.
 
 " Map the leader key to SPACE.
 let mapleader="\<SPACE>"
+
+" Map ; to : for easier typing
+nmap ; :
 
 " Move between buffers.
 nmap <Leader>l :bnext<CR>
