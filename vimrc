@@ -1,17 +1,32 @@
+"------------------------------------------------------------------------------
+" Author: Lucas Barcelos de Oliveira
+" Last update: 15/07/2017
+"
+" My .vimrc file for use with Neovim and/or Vim 8
+
 scriptencoding utf8
 
+" Automatic reloading of .vimrc on save
+augroup reload_vimrc " {
+    autocmd!
+    autocmd BufWritePost *vimrc source $MYVIMRC | AirlineRefresh
+augroup END " }
+
 "------------------------------------------------------------------------------
-" Plugins {
+" Plugins {{{
 
 filetype off
 
 call plug#begin('~/.local/share/nvim/bundle/') 
 
-" Interactive REPL for NeoVim.
-Plug 'hkupty/iron.nvim'
-
 " File tree plugin.
 Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+
+" Collection of language packs
+Plug 'sheerun/vim-polyglot'
+
+" Tag visualization plugin 
+Plug 'majutsushi/tagbar'
 
 " Status line plugin.
 Plug 'bling/vim-airline'
@@ -22,12 +37,21 @@ Plug 'ctrlpvim/ctrlp.vim'
 
 " Colorschemes.
 Plug 'morhetz/gruvbox'
-Plug 'altercation/vim-colors-solarized'
+Plug 'mhartington/oceanic-next' 
+Plug 'joshdick/onedark.vim'
 
 " Code completion for NeoVim.
-" Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-" Plug 'zchee/deoplete-jedi', {'for': ['python', 'python3']}
-Plug 'davidhalter/jedi-vim'
+Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
+Plug 'zchee/deoplete-jedi', {'for': ['python', 'python3']}
+" Plug 'davidhalter/jedi-vim'
+" Plug 'Vimjas/vim-python-pep8-indent', {'for': ['python', 'python3']}
+
+" Plugins to handle surroundings.
+Plug 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-surround'
+
+" Plugin to use tab for autocompletion.
+Plug 'ervandew/supertab'
 
 " Code linting.
 Plug 'w0rp/ale'
@@ -35,40 +59,23 @@ Plug 'w0rp/ale'
 " Code snippets.
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
-Plug 'Vimjas/vim-python-pep8-indent', {'for': ['python', 'python3']}
-Plug 'jiangmiao/auto-pairs'
 
 " Version control tools.
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
 
-" Plugin to use tab for autocompletion.
-Plug 'ervandew/supertab'
-
 " Plugin to comment text easily.
 Plug 'tpope/vim-commentary'
 
-" Simpe motion to jump to next two char block.
+" Simple motion to jump to next two char block.
 Plug 'justinmk/vim-sneak'
 
 call plug#end()  
 
-" }
+" }}}
 
 "------------------------------------------------------------------------------
-" Color Scheme configuration {
-
-set background=dark
-colorscheme gruvbox
-let g:airline_theme='gruvbox'
-if has('nvim')
-    set termguicolors
-endif
-
-" }
-
-"------------------------------------------------------------------------------
-" General config {
+" General config {{{
 
 filetype plugin on      " Allow filespecific plugins.
 set wildmenu            " Better command-line completion.
@@ -78,6 +85,10 @@ set ignorecase          " Make searching case insensitive.
 set smartcase           " ...unless the query has capital letters.
 set visualbell          " Use visual bell instead of beeping.
 set autochdir           " Switch to current file's parent directory.
+set foldmethod=marker   " Use three { as marker for folds
+set tw=79               " Set document width...
+set colorcolumn=80      " ... and mark column 80
+set nowrap              " Don't wrap lines
 let ttimeout=10         " Set insermode timeout to 10ms.
 
 if &undolevels < 200
@@ -98,10 +109,24 @@ set hidden
 " Allow backspacing over autoindent, line breaks and start of insert.
 set backspace=indent,eol,start
 
-" }
+" Better copy and paste, use same clipboard outside vim
+set clipboard=unnamed
+
+" }}}
 
 "------------------------------------------------------------------------------
-" Formatting options {
+" Color Scheme configuration {{{
+
+colorscheme onedark
+let g:airline_theme='onedark'
+if has('termguicolors')
+    set termguicolors
+endif
+
+" }}}
+
+"------------------------------------------------------------------------------
+" Formatting options {{{
 
 syntax on               " Enable syntax highlighting.
 filetype indent on      " Allow indent for know filetypes.
@@ -115,10 +140,10 @@ set shiftwidth=4        " Indentation amount for < and > commands.
 set nojoinspaces        " Prevents two spaces after punctuation on a join (J)
 set splitbelow          " Horizontal split below current. More natural splits.
 
-" }
+" }}}
 
 "------------------------------------------------------------------------------
-" Mappings {
+" Mappings {{{
 
 " Map the leader key to SPACE.
 let mapleader="\<SPACE>"
@@ -127,8 +152,12 @@ let mapleader="\<SPACE>"
 nmap ; :
 
 " Move between buffers.
-nmap <Leader>l :bnext<CR>
-nmap <Leader>h :bprevious<CR>
+nmap <Leader>k :bnext<CR>
+nmap <Leader>j :bprevious<CR>
+
+" Easier block indentation, keeps visual selection
+vnoremap < <gv
+vnoremap > >gv
 
 " Close current buffer/tab.
 nmap <Leader>w :bdelete<CR>
@@ -143,8 +172,8 @@ function! NumberToggle()
   endif
 endfunc
 
-" Toggle between normal and relative numbering. 'J' is for jump.
-nnoremap <leader>j :call NumberToggle()<cr>
+" Toggle between normal and relative numbering. 'C' is for change.
+nnoremap <leader>c :call NumberToggle()<cr>
 
 " Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
 " which is the default.
@@ -155,40 +184,57 @@ if has('nvim')
     :tnoremap <Esc> <C-\><C-n> 
 endif
 
-" Quick window navigation with Alt+HJKL.
-nmap <silent> ˚ :wincmd k<CR>
-nmap <silent> ∆ :wincmd j<CR>
-nmap <silent> ˙ :wincmd h<CR>
-nmap <silent> ¬ :wincmd l<CR>
-
-" Remap <C-c> and <C-v> to copy/paste to/from clipboard.
-vnoremap <C-c> "+y
-vnoremap <C-x> "+d
-nnoremap <C-V> "+P
-vnoremap <C-V> "+P
-nnoremap <C-v> "+p
-vnoremap <C-v> "+p
+" Quick window navigation with Alt+HJKL. On iTerm, remember to make left option
+" key work like +Esc
+nmap <silent><M-k> :wincmd k<CR>
+nmap <silent><M-j> :wincmd j<CR>
+nmap <silent><M-h> :wincmd h<CR>
+nmap <silent><M-l> :wincmd l<CR>
 
 " Clear search highlight after search.
 nnoremap <C-L> :nohlsearch<CR><C-L>
 
-" }
+" }}}
 
 "----------------------------------------------------------------------
-" Plugin specific options {
+" Plugin specific options {{{
 
 " Deoplete
-" " Enable deoplete at startup.
-" let g:deoplete#enable_at_startup = 1
+    " Enable deoplete at startup.
+    let g:deoplete#enable_at_startup = 1
+    " Use smart case for deoplete completion.
+    let g:deoplete#enable_smart_case = 1
+    " Make Deoplete ignore open buffers.
+    let b:deoplete_ignore_sources = ['buffer']
+    inoremap <silent><expr><CR> pumvisible() ? 
+                \ deoplete#mappings#close_popup() : "\<CR>"
 
-" " Use smart case for deoplete completion.
-" let g:deoplete#enable_smart_case = 1
+" " Jedi
+"     " Force Jedi to use Python3.
+"     let g:jedi#force_py_version = 3
+"     let g:jedi#auto_close_doc = 1
+"     " Select candidate with <CR>.
+"     inoremap <expr> <silent> <CR> pumvisible() ? "<C-y>" : "<CR>"
+"     " Set variable refactoring to <leader> 'v'
+"     let g:jedi#rename_command = "<leader>v"
+"     " Set usages to <leader> 'u'
+"     let g:jedi#usages_command = "<leader>u"
 
-" " Deoplete mappings.
-" inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+" SuperTab
+    " Let SuperTab scroll from top to bottom.
+    let g:SuperTabDefaultCompletionType = "<c-n>"
+    " close the preview window when you're not using it
+    let g:SuperTabClosePreviewOnPopupClose = 1
+
+" UltiSnips
+    " Use <TAB> for everything except snippets
+    let g:UltiSnipsExpandTrigger="<C-j>"
+
+" Tagbar
+    nmap <Leader>t :TagbarToggle<CR>
 
 " NERDTree
-    map <Leader>t :NERDTreeToggle<CR>
+    map <Leader>n :NERDTreeToggle<CR>
 
 " Ctrl-P
     " Open file menu.
@@ -196,18 +242,14 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
     " Open buffer menu.
     nnoremap <Leader>b :CtrlPBuffer<CR>
     " Open most recently used files.
-    nnoremap <Leader>f :CtrlPMRUFiles<CR>
-
-" Jedi
-    " Force Jedi to use Python3.
-    let g:jedi#force_py_version = 3
-    let g:jedi#auto_close_doc = 1
-    " Select candidate with <CR>.
-    inoremap <expr> <silent> <CR> pumvisible() ? "<C-y>" : "<CR>"
-
-" SuperTab
-    " Let SuperTab scroll from top to bottom.
-    let g:SuperTabDefaultCompletionType = "<c-n>"
+    nnoremap <Leader>l :CtrlPMRUFiles<CR>
+    " Keep persistent cahe file
+    let g:ctrlp_clear_cache_on_exit = 1
+    let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+    " use ag for searching instead of vim's globpath()
+    if executable('ag')
+      let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+    endif
 
 " Airline
     let g:airline#extensions#ale = 1
@@ -223,10 +265,21 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
     let g:airline_left_alt_sep = ''
     let g:airline_right_sep = ''
     let g:airline_right_alt_sep = ''
-    let g:airline_theme= 'gruvbox'
 
-" ALE {
+" ALE
     let g:ale_sign_column_always = 1
-" }
-" }
+    let g:ale_sign_error = '!'
+    let g:ale_sign_warning = '!'
+
+" Sneak
+    let g:sneak#s_next = 1
+
+" Signify
+    let g:signify_sign_change = '~'
+    let g:signify_sign_delete = '-'
+
+" Auto Pairs
+    let g:AutoPairsShortcutFastwrap='<M-e>'
+
+" }}}
 "----------------------------------------------------------------------
