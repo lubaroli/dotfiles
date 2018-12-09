@@ -1,5 +1,5 @@
 # .bashrc file
-# By Balaji S. Srinivasan (balajis@stanford.edu), modified by Lucas Barcelos 
+# By Balaji S. Srinivasan (balajis@stanford.edu), modified by Lucas Barcelos
 # (lucas.barcelos@gmail.com) for personal use.
 #
 # Concepts:

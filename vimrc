@@ -17,7 +17,7 @@ augroup END " }
 
 filetype off
 
-call plug#begin('~/.local/share/nvim/bundle/') 
+call plug#begin('~/.local/share/nvim/bundle/')
 
 " File tree plugin.
 Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
@@ -25,7 +25,7 @@ Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
 " Collection of language packs
 Plug 'sheerun/vim-polyglot'
 
-" Tag visualization plugin 
+" Tag visualization plugin
 Plug 'majutsushi/tagbar'
 
 " Status line plugin.
@@ -37,7 +37,7 @@ Plug 'ctrlpvim/ctrlp.vim'
 
 " Colorschemes.
 Plug 'morhetz/gruvbox'
-Plug 'mhartington/oceanic-next' 
+Plug 'mhartington/oceanic-next'
 Plug 'joshdick/onedark.vim'
 
 " Code completion for NeoVim.
@@ -70,7 +70,10 @@ Plug 'tpope/vim-commentary'
 " Simple motion to jump to next two char block.
 Plug 'justinmk/vim-sneak'
 
-call plug#end()  
+" Plugin to add file type icons to many other plugins
+Plug 'ryanoasis/vim-devicons'
+
+call plug#end()
 
 " }}}
 
@@ -180,8 +183,8 @@ nnoremap <leader>c :call NumberToggle()<cr>
 map Y y$
 
 " Map ESC to exit Terminal mode in NeoVim.
-if has('nvim') 
-    :tnoremap <Esc> <C-\><C-n> 
+if has('nvim')
+    :tnoremap <Esc> <C-\><C-n>
 endif
 
 " Quick window navigation with Alt+HJKL. On iTerm, remember to make left option
@@ -206,7 +209,7 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
     let g:deoplete#enable_smart_case = 1
     " Make Deoplete ignore open buffers.
     let b:deoplete_ignore_sources = ['buffer']
-    inoremap <silent><expr><CR> pumvisible() ? 
+    inoremap <silent><expr><CR> pumvisible() ?
                 \ deoplete#mappings#close_popup() : "\<CR>"
 
 " " Jedi
@@ -253,18 +256,7 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
 
 " Airline
     let g:airline#extensions#ale = 1
-    let g:airline_powerline_fonts = 1 
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline#extensions#tabline#buffer_idx_mode = 1
-    let g:airline#extensions#tabline#fnamemod = ':t'
-    let g:airline#extensions#tabline#left_sep = ''
-    let g:airline#extensions#tabline#left_alt_sep = ''
-    let g:airline#extensions#tabline#right_sep = ''
-    let g:airline#extensions#tabline#right_alt_sep = ''
-    let g:airline_left_sep = ''
-    let g:airline_left_alt_sep = ''
-    let g:airline_right_sep = ''
-    let g:airline_right_alt_sep = ''
+    let g:airline_powerline_fonts = 1
 
 " ALE
     let g:ale_sign_column_always = 1
