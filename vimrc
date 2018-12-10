@@ -39,12 +39,12 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'morhetz/gruvbox'
 Plug 'mhartington/oceanic-next'
 Plug 'joshdick/onedark.vim'
+Plug 'jacoborus/tender.vim'
 
 " Code completion for NeoVim.
 Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-Plug 'zchee/deoplete-jedi', {'for': ['python', 'python3']}
-" Plug 'davidhalter/jedi-vim'
-" Plug 'Vimjas/vim-python-pep8-indent', {'for': ['python', 'python3']}
+Plug 'zchee/deoplete-jedi'
+Plug 'davidhalter/jedi-vim'
 
 " Plugins to handle surroundings.
 Plug 'jiangmiao/auto-pairs'
@@ -120,12 +120,12 @@ set clipboard=unnamed
 "------------------------------------------------------------------------------
 " Color Scheme configuration {{{
 
-colorscheme onedark
-let g:airline_theme='onedark'
+colorscheme gruvbox
+let g:airline_theme='gruvbox'
+set background=dark
 if has('termguicolors')
     set termguicolors
 endif
-
 " }}}
 
 "------------------------------------------------------------------------------
@@ -255,6 +255,7 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
     endif
 
 " Airline
+    let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#ale = 1
     let g:airline_powerline_fonts = 1
 
