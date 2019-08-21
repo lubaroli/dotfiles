@@ -1,16 +1,10 @@
 "------------------------------------------------------------------------------
 " Author: Lucas Barcelos de Oliveira
-" Last update: 15/07/2017
+" Last update: 07/08/2019
 "
-" My .vimrc file for use with Neovim and/or Vim 8
+" My .vimrc file for use with Neovim and/or Oni
 
 scriptencoding utf8
-
-" Automatic reloading of .vimrc on save
-augroup reload_vimrc " {
-    autocmd!
-    autocmd BufWritePost *vimrc source $MYVIMRC | AirlineRefresh
-augroup END " }
 
 "------------------------------------------------------------------------------
 " Plugins {{{
@@ -19,46 +13,39 @@ filetype off
 
 call plug#begin('~/.local/share/nvim/bundle/')
 
-" File tree plugin.
-Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+if !exists("g:gui_oni")
+    " File tree plugin.
+    Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
 
-" Collection of language packs
-Plug 'sheerun/vim-polyglot'
+    " Tag management and visualization
+    Plug 'majutsushi/tagbar'
+    Plug 'ludovicchabant/vim-gutentags'
 
-" Tag visualization plugin
-Plug 'majutsushi/tagbar'
+    " Status line plugin
+    Plug 'bling/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
 
-" Status line plugin.
-Plug 'bling/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+    " Fuzzy logic search engine
+    Plug 'ctrlpvim/ctrlp.vim'
 
-" Fuzzy logic search engine.
-Plug 'ctrlpvim/ctrlp.vim'
+    " Colorschemes
+    Plug 'morhetz/gruvbox'
+    Plug 'joshdick/onedark.vim'
+    Plug 'jacoborus/tender.vim'
 
-" Colorschemes.
-Plug 'morhetz/gruvbox'
-Plug 'mhartington/oceanic-next'
-Plug 'joshdick/onedark.vim'
-Plug 'jacoborus/tender.vim'
+    " LSP for NeoVim
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-" Code completion for NeoVim.
-Plug 'Shougo/deoplete.nvim', {'do': ':UpdateRemotePlugins'}
-Plug 'zchee/deoplete-jedi'
-Plug 'davidhalter/jedi-vim'
+    " Plugin to use tab for autocompletion
+    Plug 'ervandew/supertab'
+endif
 
 " Plugins to handle surroundings.
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 
-" Plugin to use tab for autocompletion.
-Plug 'ervandew/supertab'
-
-" Code linting.
-Plug 'w0rp/ale'
-
-" Code snippets.
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+" Plugin to display and clean leading whitespaces
+Plug 'ntpeters/vim-better-whitespace'
 
 " Version control tools.
 Plug 'tpope/vim-fugitive'
@@ -73,6 +60,9 @@ Plug 'justinmk/vim-sneak'
 " Plugin to add file type icons to many other plugins
 Plug 'ryanoasis/vim-devicons'
 
+" Plugin for interactive iPython REPL
+Plug 'bfredl/nvim-ipy'
+
 call plug#end()
 
 " }}}
@@ -80,51 +70,72 @@ call plug#end()
 "------------------------------------------------------------------------------
 " General config {{{
 
-filetype plugin on      " Allow filespecific plugins.
-set wildmenu            " Better command-line completion.
-set laststatus=2        " Always display the status line .
-set mouse=a             " Enable use of the mouse for all modes.
-set ignorecase          " Make searching case insensitive.
-set smartcase           " ...unless the query has capital letters.
-set visualbell          " Use visual bell instead of beeping.
-set autochdir           " Switch to current file's parent directory.
+filetype plugin on      " Allow filespecific plugins
+set wildmenu            " Better command-line completion
+set laststatus=2        " Always display the status line
+set mouse=a             " Enable use of the mouse for all modes
+set ignorecase          " Make searching case insensitive
+set smartcase           " ...unless the query has capital letters
+set visualbell          " Use visual bell instead of beeping
+set autochdir           " Switch to current file's parent directory
 set foldmethod=marker   " Use three { as marker for folds
 set tw=79               " Set document width...
 set colorcolumn=80      " ... and mark column 80
 set nowrap              " Don't wrap lines
-let ttimeout=10         " Set insermode timeout to 10ms.
+set updatetime=300      " Improve experience for diagnostic messages
+set shortmess+=c        " Don't give |ins-completion-menu| messages
+let ttimeout=10         " Set insermode timeout to 10ms
+set splitbelow          " Make splits more natural
+set splitright
 
 if &undolevels < 200
-    set undolevels=200  " Number of undo levels.
+    set undolevels=200  " Number of undo levels
 endif
 
 if !&scrolloff
-  set scrolloff=3       " Show next 3 lines while scrolling.
+  set scrolloff=3       " Show next 3 lines while scrolling
 endif
 if !&sidescrolloff
-  set sidescrolloff=5   " Show next 5 columns while side-scrolling.
+  set sidescrolloff=5   " Show next 5 columns while side-scrolling
 endif
 
-" Allows you to switch from an unsaved buffer without saving it first.
-" Also allows you to keep an undo history for multiple files.
+" Allows you to switch from an unsaved buffer without saving it first
+" Also allows you to keep an undo history for multiple files
 set hidden
 
-" Allow backspacing over autoindent, line breaks and start of insert.
+" Makes only the neovim terminal hidden on when not loaded on a split/window
+augroup custom_term
+    autocmd!
+    autocmd TermOpen * setlocal bufhidden=hide
+augroup END
+
+" Allow backspacing over autoindent, line breaks and start of insert
 set backspace=indent,eol,start
 
 " Better copy and paste, use same clipboard outside vim
 set clipboard=unnamed
 
+if exists('g:gui_oni')
+    " Disable nvim statusbar and use oni's
+    set noshowmode
+    set noruler
+    set laststatus=0
+    set noshowcmd
+    " editor.fontFamily Hack??
+endif
 " }}}
 
 "------------------------------------------------------------------------------
 " Color Scheme configuration {{{
 
-colorscheme gruvbox
-let g:airline_theme='gruvbox'
-set background=dark
-if has('termguicolors')
-    set termguicolors
+" If not on Oni, use theme below
+if !exists('g:gui_oni')
+    colorscheme gruvbox
+    let g:airline_theme='gruvbox'
+    set background=dark
+    if has('termguicolors')
+        set termguicolors
+    endif
 endif
 " }}}
 
@@ -149,21 +160,36 @@ set splitbelow          " Horizontal split below current. More natural splits.
 " Mappings {{{
 
 " Map the leader key to SPACE.
-let mapleader="\<SPACE>"
+let mapleader="\<space>"
 
 " Map ; to : for easier typing
 nmap ; :
 
-" Move between buffers.
-nmap <Leader>k :bnext<CR>
-nmap <Leader>j :bprevious<CR>
+" Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
+" which is the default.
+map Y y$
+
+" Map ESC to exit Terminal mode in NeoVim.
+if has('nvim')
+    :tnoremap <Esc> <C-\><C-n>
+endif
 
 " Easier block indentation, keeps visual selection
 vnoremap < <gv
 vnoremap > >gv
 
+" Clear search highlight after search.
+nnoremap <C-L> :nohlsearch<CR><C-L>
+
+"------------------------------------------------------------------------------
+" Navigation mappings
+
+" Move between buffers.
+nmap <Leader>k :bnext<CR>
+nmap <Leader>j :bprevious<CR>
+
 " Close current buffer/tab.
-nmap <Leader>w :bdelete<CR>
+nmap <Leader>w :bdelete!<CR>
 
 " Relative numbering.
 function! NumberToggle()
@@ -178,74 +204,97 @@ endfunc
 " Toggle between normal and relative numbering. 'C' is for change.
 nnoremap <leader>c :call NumberToggle()<cr>
 
-" Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
-" which is the default.
-map Y y$
-
-" Map ESC to exit Terminal mode in NeoVim.
-if has('nvim')
-    :tnoremap <Esc> <C-\><C-n>
-endif
-
-" Quick window navigation with Alt+HJKL. On iTerm, remember to make left option
-" key work like +Esc
+" Quick window navigation with Alt+HJKL. On iTerm, remember to make left
+" option key work like +Esc
 nmap <silent><M-k> :wincmd k<CR>
 nmap <silent><M-j> :wincmd j<CR>
 nmap <silent><M-h> :wincmd h<CR>
 nmap <silent><M-l> :wincmd l<CR>
 
-" Clear search highlight after search.
-nnoremap <C-L> :nohlsearch<CR><C-L>
+" Auto Pairs
+let g:AutoPairsShortcutFastwrap='<M-e>'
+
+if !exists('g:gui_oni')
+    " Mappings for terminal
+
+    " coc.nvim
+    " Use <c-space> to trigger completion.
+    inoremap <silent><expr> <c-space> coc#refresh()
+    " Use <cr> to confirm completion, `<C-g>u` means break undo chain at
+    " current position. Coc does snippet and additional edit on confirm.
+    " inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+    " Use <leader> + l as baseline command (l for language server)
+    nmap <silent> <leader>lE <Plug>(coc-diagnostic-prev)
+    nmap <silent> <leader>le <Plug>(coc-diagnostic-next)
+    nmap <silent> <leader>ld <Plug>(coc-definition)
+    nmap <silent> <leader>ly <Plug>(coc-type-definition)
+    nmap <silent> <leader>li <Plug>(coc-implementation)
+    nmap <silent> <leader>lr <Plug>(coc-references)
+    " Use k as a shorthand to show documentation in preview window
+    nnoremap <silent> <leader>lk :call CocActionAsync("doHover")<CR>
+    " Remap for rename current word
+    nmap <leader>lr <Plug>(coc-rename)
+    " Remap for do codeAction of current line
+    nmap <leader>la  <Plug>(coc-codeaction)
+    " Fix autofix problem of current line
+    nmap <leader>lf  <Plug>(coc-fix-current)
+
+    " Tagbar
+    nmap <Leader>t :TagbarToggle<CR>
+
+    " NERDTree
+    map <Leader>n :NERDTreeToggle<CR>
+
+    " Ctrl-P
+    " Open file menu (o for open file)
+    nnoremap <Leader>o :CtrlP<CR>
+    " Open buffer menu
+    nnoremap <Leader>b :CtrlPBuffer<CR>
+    " Open most recently used files (h for history)
+    nnoremap <Leader>h :CtrlPMRUFiles<CR>
+else
+    " Keymaps for Oni
+    " Use `[c` and `]c` to navigate diagnostics
+    nmap <silent> <leader>lE :call OniCommand('oni.editor.previousError')<CR>
+    nmap <silent> <leader>le :call OniCommand('oni.editor.nextError')<CR>
+    " Remap for rename current word
+    nmap <leader>lr :call OniCommand('')
+endif
+
+" nvim-ipy
+let g:nvim_ipy_perform_mappings = 0
+" Use <leader> + r as baseline command
+" Run current line or selection
+map <silent> <leader>r <Plug>(IPy-Run)
+" Run all lines in buffer
+map <silent> <leader>ra <Plug>(IPy-RunAll)
+" Complete command on iPython
+map <silent> <leader>rc <Plug>(IPy-Complete)
+" Send interrupt to kernel
+map <silent> <leader>ri <Plug>(IPy-Interrupt)
+" Terminate kernel
+map <silent> <leader>rt <Plug>(IPy-Terminate)
 
 " }}}
 
 "----------------------------------------------------------------------
 " Plugin specific options {{{
 
-" Deoplete
-    " Enable deoplete at startup.
-    let g:deoplete#enable_at_startup = 1
-    " Use smart case for deoplete completion.
-    let g:deoplete#enable_smart_case = 1
-    " Make Deoplete ignore open buffers.
-    let b:deoplete_ignore_sources = ['buffer']
-    inoremap <silent><expr><CR> pumvisible() ?
-                \ deoplete#mappings#close_popup() : "\<CR>"
+if !exists('g:gui_oni')
+    " Plugin options for terminal only
 
-" " Jedi
-"     " Force Jedi to use Python3.
-"     let g:jedi#force_py_version = 3
-"     let g:jedi#auto_close_doc = 1
-"     " Select candidate with <CR>.
-"     inoremap <expr> <silent> <CR> pumvisible() ? "<C-y>" : "<CR>"
-"     " Set variable refactoring to <leader> 'v'
-"     let g:jedi#rename_command = "<leader>v"
-"     " Set usages to <leader> 'u'
-"     let g:jedi#usages_command = "<leader>u"
-
-" SuperTab
+    " SuperTab
     " Let SuperTab scroll from top to bottom.
     let g:SuperTabDefaultCompletionType = "<c-n>"
     " close the preview window when you're not using it
     let g:SuperTabClosePreviewOnPopupClose = 1
 
-" UltiSnips
-    " Use <TAB> for everything except snippets
-    let g:UltiSnipsExpandTrigger="<C-j>"
+    " Airline
+    let g:airline#extensions#tabline#enabled = 1
+    let g:airline#extensions#ale#enabled = 1
+    let g:airline_powerline_fonts = 1
 
-" Tagbar
-    nmap <Leader>t :TagbarToggle<CR>
-
-" NERDTree
-    map <Leader>n :NERDTreeToggle<CR>
-
-" Ctrl-P
-    " Open file menu.
-    nnoremap <Leader>o :CtrlP<CR>
-    " Open buffer menu.
-    nnoremap <Leader>b :CtrlPBuffer<CR>
-    " Open most recently used files.
-    nnoremap <Leader>l :CtrlPMRUFiles<CR>
+    " Ctrl-P
     " Keep persistent cahe file
     let g:ctrlp_clear_cache_on_exit = 1
     let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
@@ -253,26 +302,17 @@ nnoremap <C-L> :nohlsearch<CR><C-L>
     if executable('ag')
       let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
     endif
+endif
 
-" Airline
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline#extensions#ale = 1
-    let g:airline_powerline_fonts = 1
-
-" ALE
-    let g:ale_sign_column_always = 1
-    let g:ale_sign_error = '!'
-    let g:ale_sign_warning = '!'
+" Better-whitespaces
+let g:strip_whitespace_on_save = 1
 
 " Sneak
-    let g:sneak#s_next = 1
+let g:sneak#s_next = 1
 
 " Signify
-    let g:signify_sign_change = '~'
-    let g:signify_sign_delete = '-'
-
-" Auto Pairs
-    let g:AutoPairsShortcutFastwrap='<M-e>'
+let g:signify_sign_change = '~'
+let g:signify_sign_delete = '-'
 
 " }}}
 "----------------------------------------------------------------------
