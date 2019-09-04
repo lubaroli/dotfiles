@@ -38,7 +38,10 @@ if !exists("g:gui_oni")
 
     " Plugin to use tab for autocompletion
     Plug 'ervandew/supertab'
-endif
+
+    " Plugin to keep windows open on buffer close
+    Plug 'qpkorr/vim-bufkill'
+    endif
 
 " Plugins to handle surroundings.
 Plug 'jiangmiao/auto-pairs'
@@ -189,7 +192,7 @@ nmap <Leader>k :bnext<CR>
 nmap <Leader>j :bprevious<CR>
 
 " Close current buffer/tab.
-nmap <Leader>w :bdelete!<CR>
+nmap <Leader>w :BD!<CR>
 
 " Relative numbering.
 function! NumberToggle()
