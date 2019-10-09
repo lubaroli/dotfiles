@@ -1,0 +1,130 @@
+"------------------------------------------------------------------------------
+" General config
+" ==============
+
+set ignorecase          " Make searching case insensitive
+set smartcase           " ...unless the query has capital letters
+set visualbell          " Use visual bell instead of beeping
+set foldmethod=marker   " Use three { as marker for folds
+let ttimeout=10         " Set insermode timeout to 10ms
+set hlsearch
+set showmode
+set clipboard^=unnamedplus,unnamed
+set incsearch hlsearch
+set autoread
+set wildmenu            " Smarter command line completion
+set scrolloff=3
+set autoindent
+set noerrorbells
+set novisualbell
+set mousehide
+
+if &undolevels < 5000
+    set undolevels=5000 " Number of undo levels
+endif
+
+if !&scrolloff
+  set scrolloff=3       " Show next 3 lines while scrolling
+endif
+if !&sidescrolloff
+  set sidescrolloff=5   " Show next 5 columns while side-scrolling
+endif
+
+" Emulate plugins
+set surround            " Emulate tpope surround
+set multiple-cursors
+set commentary          " Emulate tpope commentary
+set ideajoin            " Smarter line join
+
+" Map the leader key to SPACE.
+let mapleader=' '
+" let mapleader="\<space>"
+
+"------------------------------------------------------------------------------
+" Productivity mappings
+" =====================
+
+" Map ; to : for easier typing
+nmap ; :
+
+" Map Y to act like D and C, i.e. to yank until EOL, rather than act as yy,
+" which is the default.
+map Y y$
+
+" Redo
+nnoremap U <C-r>
+
+" Easier block indentation, keeps visual selection
+vnoremap < <gv
+vnoremap > >gv
+
+" Add lines
+nnoremap [<space> O<esc>j
+nnoremap ]<space> o<esc>k
+
+" Clear search highlight after search.
+nnoremap <leader>cs :nohlsearch<CR>
+
+
+"------------------------------------------------------------------------------
+" Action mappings
+"
+" Tip: Show all the provided actions via `:actionlist`
+" ====================================================
+
+nnoremap <Leader>pm :action ShowPopupMenu<CR>
+
+" code refactoring
+nnoremap <leader>ff :action FindInPath<cr>
+nnoremap <leader>ic :action InspectCode<cr>
+nnoremap <leader>oi :action OptimizeImports<cr>
+nnoremap <leader>rn :action RenameElement<cr>
+nnoremap <leader>== :action ReformatCode<cr>
+nnoremap <leader>tt :action ActivateTerminalToolWindow<cr>
+
+" Run & debugging
+nnoremap <leader><leader>rf :action Run<cr>
+nnoremap <leader><leader>rc :action RunClass<cr>
+nnoremap <leader><leader>df :action Debug<cr>
+nnoremap <leader><leader>dc :action DebugClass<cr>
+nnoremap <leader><leader>s :action Stop<cr>
+nnoremap <leader>si :action StepInto<cr>
+nnoremap <leader>sm :action StepIntoMyCode<cr>
+nnoremap <leader>so :action StepOut<cr>
+nnoremap <leader>n :action StepOver<cr>
+nnoremap <leader>bb :action ToggleLineBreakpoint<cr>
+nnoremap <leader>br :action ViewBreakpoints<cr>
+
+" Code navigation
+nnoremap <leader>su :action ShowUsages<cr>
+nnoremap <leader>gd :action GotoImplementation<cr>
+nnoremap <leader>gu :action GotoSuperMethod<cr>
+nnoremap [m :action MethodUp<cr>
+nnoremap ]m :action MethodDown<cr>
+nnoremap [c :action PreviousOccurence<cr>
+nnoremap ]c :action NextOccurence<cr>
+noremap [e :action VimMotionCamelEndLeft<cr>
+noremap ]e :action VimMotionCamelEndRight<cr>
+noremap [w :action VimMotionCamelLeft<cr>
+noremap ]w :action VimMotionCamelRight<cr>
+noremap [b :action VimMotionCamelRight<cr>
+noremap ]b :action VimMotionCamelLeft<cr>
+
+" Find anything
+nnoremap <Leader>f :action SearchEverywhere<CR>
+nnoremap <Leader>ga :action GotoAction<CR>
+nnoremap <Leader>gc :action GotoClass<CR>
+nnoremap <Leader>gf :action GotoFile<CR>
+nnoremap <Leader>gs :action GotoSymbol<CR>
+
+" Tab navigation
+nnoremap <leader>k gt
+nnoremap <leader>j gT
+inoremap <C-k> <Up>
+
+" Future additions...
+" ActivatePythonConsoleToolWindow
+" ActivateSciViewToolWindow
+" Diff.ShowDiff
+" Diff.NextChange
+" PreviousDiff
