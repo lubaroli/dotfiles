@@ -15,9 +15,9 @@ PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 ## -------------------------
 
 function parse_git_branch {
-   git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
-PS1="\[\e[1;36m\]\u@\h \[\e[1;34m\]\$(parse_git_branch) \[\e[1;33m\]\w \[\e[0m\]"
+PS1="\[\e[1;36m\]\u@\h\[\e[1;34m\]\$(parse_git_branch) \[\e[1;33m\]\w \[\e[0m\]"
 
 ## -----------------------
 ## -- 3) Set up aliases --
