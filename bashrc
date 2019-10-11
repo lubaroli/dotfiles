@@ -1,14 +1,5 @@
 # .bashrc file
 # Created by Lucas Barcelos (lucas.barcelos@gmail.com) for personal use.
-#
-
-CLICOLOR=1
-
-## -----------------------
-## -- 1) Configure PATH --
-## -----------------------
-PATH="/usr/local/opt/python/libexec/bin/:${PATH}"
-PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 ## -------------------------
 ## -- 2) Configure prompt --
