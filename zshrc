@@ -3,14 +3,8 @@
 
 export CLICOLOR=1
 
-## -----------------------
-## -- 1) Configure PATH --
-## -----------------------
-PATH="/usr/local/opt/python/libexec/bin/:${PATH}"
-PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-
 ## -------------------------
-## -- 2) Configure prompt --
+## -- 1) Configure prompt --
 ## -------------------------
 
 setopt prompt_subst
@@ -22,16 +16,16 @@ parse_git_branch() {
 PROMPT='%B%{$fg[cyan]%}%n@%m%b$(parse_git_branch) %B%{$fg[yellow]%}%~%b %{$reset_color%}'
 
 ## -----------------------
-## -- 3) Set up aliases --
+## -- 2) Set up aliases --
 ## -----------------------
 
-# 3.1) Safety
+# 2.1) Safety
 alias rm="rm -i"
 alias mv="mv -i"
 alias cp="cp -i"
 set -o noclobber
 
-# 3.2) Listing, directories, and motion
+# 2.2) Listing, directories, and motion
 alias ll="ls -la"
 alias la="ls -A"
 alias l="ls -C"
@@ -44,3 +38,27 @@ alias cl='clear'
 # 3.3) grep options
 export GREP_OPTIONS='--color=auto'
 export GREP_COLOR='1;31' # green for matches
+
+## -----------------------
+## -- 3) Configure PATH --
+## -----------------------
+PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/lubaroli/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/lubaroli/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/lubaroli/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/lubaroli/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+# Added by the garage installer
+export MUJOCO_GL="glfw"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/Users/lubaroli/.mujoco/mujoco200/bin"
