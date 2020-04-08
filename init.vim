@@ -4,50 +4,57 @@
 "
 " My .vimrc file for use with Neovim and/or Oni
 
-scriptencoding utf8
-
 "------------------------------------------------------------------------------
 " Plugins {{{
 
 filetype off
 
-call plug#begin('~/.local/share/nvim/bundle/')
+" Bootstrap Plug
+let plug_install = 0
+let autoload_plug_path = stdpath('config') . '/autoload/plug.vim'
+if !filereadable(autoload_plug_path)
+    silent exe '!curl -fL --create-dirs -o ' . autoload_plug_path .
+        \ ' https://raw.github.com/junegunn/vim-plug/master/plug.vim'
+    execute 'source ' . fnameescape(autoload_plug_path)
+    let plug_install = 1
+endif
+unlet autoload_plug_path
 
-if !exists("g:gui_oni")
-    " File tree plugin.
-    Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
+call plug#begin(stdpath('data') . 'plugged')
 
-    " Tag management and visualization
-    Plug 'majutsushi/tagbar'
-    Plug 'ludovicchabant/vim-gutentags'
+" File tree plugin.
+Plug 'scrooloose/nerdtree', {'on': 'NERDTreeToggle'}
 
-    " Status line plugin
-    Plug 'bling/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
+" Tag management and visualization.
+Plug 'majutsushi/tagbar'
+Plug 'ludovicchabant/vim-gutentags'
 
-    " Fuzzy logic search engine
-    Plug 'ctrlpvim/ctrlp.vim'
+" Status line plugin.
+Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 
-    " Colorschemes
-    Plug 'morhetz/gruvbox'
-    Plug 'joshdick/onedark.vim'
-    Plug 'jacoborus/tender.vim'
+" Fuzzy logic search engine.
+Plug 'ctrlpvim/ctrlp.vim'
 
-    " LSP for NeoVim
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Colorschemes.
+Plug 'morhetz/gruvbox'
+Plug 'joshdick/onedark.vim'
+Plug 'jacoborus/tender.vim'
 
-    " Plugin to use tab for autocompletion
-    Plug 'ervandew/supertab'
+" LSP for NeoVim.
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 
-    " Plugin to keep windows open on buffer close
-    Plug 'qpkorr/vim-bufkill'
-    endif
+" Plugin to use tab for autocompletion.
+Plug 'ervandew/supertab'
+
+" Plugin to keep windows open on buffer close.
+Plug 'qpkorr/vim-bufkill'
 
 " Plugins to handle surroundings.
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 
-" Plugin to display and clean leading whitespaces
+" Plugin to display and clean leading whitespaces.
 Plug 'ntpeters/vim-better-whitespace'
 
 " Version control tools.
@@ -60,20 +67,25 @@ Plug 'tpope/vim-commentary'
 " Simple motion to jump to next two char block.
 Plug 'justinmk/vim-sneak'
 
-" Plugin to add file type icons to many other plugins
+" Plugin to add file type icons to many other plugins. Needs a patched font.
 Plug 'ryanoasis/vim-devicons'
 
-" Plugin for interactive iPython REPL
-Plug 'bfredl/nvim-ipy'
-
 call plug#end()
+
+if plug_install
+    PlugInstall --sync
+endif
+unlet plug_install
 
 " }}}
 
 "------------------------------------------------------------------------------
 " General config {{{
 
+syntax on               " Enable syntax highlighting.
+filetype indent on      " Allow indent for know filetypes.
 filetype plugin on      " Allow filespecific plugins
+set encoding=UTF-8      " Set encoding to UTF-8.
 set wildmenu            " Better command-line completion
 set laststatus=2        " Always display the status line
 set mouse=a             " Enable use of the mouse for all modes
@@ -82,14 +94,23 @@ set smartcase           " ...unless the query has capital letters
 set visualbell          " Use visual bell instead of beeping
 set autochdir           " Switch to current file's parent directory
 set foldmethod=marker   " Use three { as marker for folds
-set tw=79               " Set document width...
-set colorcolumn=80      " ... and mark column 80
 set nowrap              " Don't wrap lines
 set updatetime=300      " Improve experience for diagnostic messages
 set shortmess+=c        " Don't give |ins-completion-menu| messages
+set cmdheight=2         " Better display for messages
 let ttimeout=10         " Set insermode timeout to 10ms
 set splitbelow          " Make splits more natural
 set splitright
+set autoindent          " Keeps the same line ident for generic file types.
+set showmatch           " Show matching brackets.
+set number              " Show the line numbers on the left side.
+set formatoptions+=o    " Continue comment marker in new lines.
+set nojoinspaces        " Prevents two spaces after punctuation on a join (J)
+set expandtab           " Insert spaces when TAB is pressed.
+set tabstop=4           " Render TABs using this many spaces.
+set shiftwidth=4        " Indentation amount for < and > commands.
+set tw=79               " Set document width...
+set colorcolumn=80      " ... and mark column 80
 
 if &undolevels < 200
     set undolevels=200  " Number of undo levels
@@ -118,45 +139,18 @@ set backspace=indent,eol,start
 " Better copy and paste, use same clipboard outside vim
 set clipboard=unnamed
 
-if exists('g:gui_oni')
-    " Disable nvim statusbar and use oni's
-    set noshowmode
-    set noruler
-    set laststatus=0
-    set noshowcmd
-    " editor.fontFamily Hack??
-endif
 " }}}
 
 "------------------------------------------------------------------------------
 " Color Scheme configuration {{{
 
 " If not on Oni, use theme below
-if !exists('g:gui_oni')
-    colorscheme gruvbox
-    let g:airline_theme='gruvbox'
-    set background=dark
-    if has('termguicolors')
-        set termguicolors
-    endif
+colorscheme gruvbox
+let g:airline_theme='gruvbox'
+set background=dark
+if has('termguicolors')
+    set termguicolors
 endif
-" }}}
-
-"------------------------------------------------------------------------------
-" Formatting options {{{
-
-syntax on               " Enable syntax highlighting.
-filetype indent on      " Allow indent for know filetypes.
-set autoindent          " Keeps the same line ident for generic file types.
-set showmatch           " Show matching brackets.
-set number              " Show the line numbers on the left side.
-set formatoptions+=o    " Continue comment marker in new lines.
-set expandtab           " Insert spaces when TAB is pressed.
-set tabstop=4           " Render TABs using this many spaces.
-set shiftwidth=4        " Indentation amount for < and > commands.
-set nojoinspaces        " Prevents two spaces after punctuation on a join (J)
-set splitbelow          " Horizontal split below current. More natural splits.
-
 " }}}
 
 "------------------------------------------------------------------------------
@@ -217,52 +211,47 @@ nmap <silent><M-l> :wincmd l<CR>
 " Auto Pairs
 let g:AutoPairsShortcutFastwrap='<M-e>'
 
-if !exists('g:gui_oni')
-    " Mappings for terminal
+" coc.nvim
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at
+" current position. Coc does snippet and additional edit on confirm.
+" inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" Use <leader> + l as baseline command (l for language server)
+nmap <silent> <leader>lE <Plug>(coc-diagnostic-prev)
+nmap <silent> <leader>le <Plug>(coc-diagnostic-next)
+nmap <silent> <leader>ld <Plug>(coc-definition)
+nmap <silent> <leader>ly <Plug>(coc-type-definition)
+nmap <silent> <leader>li <Plug>(coc-implementation)
+nmap <silent> <leader>lr <Plug>(coc-references)
+" Use k as a shorthand to show documentation in preview window
+nnoremap <silent> <leader>lk :call CocActionAsync("doHover")<CR>
+" Remap for rename current word
+nmap <leader>lr <Plug>(coc-rename)
+" Remap for do codeAction of current line
+nmap <leader>la  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>lf  <Plug>(coc-fix-current)
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call CocAction('fold', <f-args>)
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
 
-    " coc.nvim
-    " Use <c-space> to trigger completion.
-    inoremap <silent><expr> <c-space> coc#refresh()
-    " Use <cr> to confirm completion, `<C-g>u` means break undo chain at
-    " current position. Coc does snippet and additional edit on confirm.
-    " inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-    " Use <leader> + l as baseline command (l for language server)
-    nmap <silent> <leader>lE <Plug>(coc-diagnostic-prev)
-    nmap <silent> <leader>le <Plug>(coc-diagnostic-next)
-    nmap <silent> <leader>ld <Plug>(coc-definition)
-    nmap <silent> <leader>ly <Plug>(coc-type-definition)
-    nmap <silent> <leader>li <Plug>(coc-implementation)
-    nmap <silent> <leader>lr <Plug>(coc-references)
-    " Use k as a shorthand to show documentation in preview window
-    nnoremap <silent> <leader>lk :call CocActionAsync("doHover")<CR>
-    " Remap for rename current word
-    nmap <leader>lr <Plug>(coc-rename)
-    " Remap for do codeAction of current line
-    nmap <leader>la  <Plug>(coc-codeaction)
-    " Fix autofix problem of current line
-    nmap <leader>lf  <Plug>(coc-fix-current)
+" Tagbar
+nmap <Leader>t :TagbarToggle<CR>
 
-    " Tagbar
-    nmap <Leader>t :TagbarToggle<CR>
+" NERDTree
+map <Leader>n :NERDTreeToggle<CR>
 
-    " NERDTree
-    map <Leader>n :NERDTreeToggle<CR>
-
-    " Ctrl-P
-    " Open file menu (o for open file)
-    nnoremap <Leader>o :CtrlP<CR>
-    " Open buffer menu
-    nnoremap <Leader>b :CtrlPBuffer<CR>
-    " Open most recently used files (h for history)
-    nnoremap <Leader>h :CtrlPMRUFiles<CR>
-else
-    " Keymaps for Oni
-    " Use `[c` and `]c` to navigate diagnostics
-    nmap <silent> <leader>lE :call OniCommand('oni.editor.previousError')<CR>
-    nmap <silent> <leader>le :call OniCommand('oni.editor.nextError')<CR>
-    " Remap for rename current word
-    nmap <leader>lr :call OniCommand('')
-endif
+" Ctrl-P
+" Open file menu (o for open file)
+nnoremap <Leader>o :CtrlP<CR>
+" Open buffer menu
+nnoremap <Leader>b :CtrlPBuffer<CR>
+" Open most recently used files (h for history)
+nnoremap <Leader>h :CtrlPMRUFiles<CR>
 
 " nvim-ipy
 let g:nvim_ipy_perform_mappings = 0
@@ -283,28 +272,24 @@ map <silent> <leader>rt <Plug>(IPy-Terminate)
 "----------------------------------------------------------------------
 " Plugin specific options {{{
 
-if !exists('g:gui_oni')
-    " Plugin options for terminal only
+" SuperTab
+" Let SuperTab scroll from top to bottom.
+let g:SuperTabDefaultCompletionType = "<c-n>"
+" close the preview window when you're not using it
+let g:SuperTabClosePreviewOnPopupClose = 1
 
-    " SuperTab
-    " Let SuperTab scroll from top to bottom.
-    let g:SuperTabDefaultCompletionType = "<c-n>"
-    " close the preview window when you're not using it
-    let g:SuperTabClosePreviewOnPopupClose = 1
+" Airline
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#ale#enabled = 1
+let g:airline_powerline_fonts = 1
 
-    " Airline
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline#extensions#ale#enabled = 1
-    let g:airline_powerline_fonts = 1
-
-    " Ctrl-P
-    " Keep persistent cahe file
-    let g:ctrlp_clear_cache_on_exit = 1
-    let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
-    " use ag for searching instead of vim's globpath()
-    if executable('ag')
-      let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-    endif
+" Ctrl-P
+" Keep persistent cahe file
+let g:ctrlp_clear_cache_on_exit = 1
+let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+" use ag for searching instead of vim's globpath()
+if executable('ag')
+  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 endif
 
 " Better-whitespaces
