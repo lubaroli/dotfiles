@@ -1,11 +1,12 @@
-"------------------------------------------------------------------------------
+" =============================================================================
 " Author: Lucas Barcelos de Oliveira
-" Last update: 07/08/2019
+" Last update: 14/04/2020
 "
-" My .vimrc file for use with Neovim and/or Oni
+" My init.vim for Neovim
+" =============================================================================
 
-"------------------------------------------------------------------------------
-" Plugins {{{
+" Plugins
+" =======
 
 filetype off
 
@@ -41,8 +42,14 @@ Plug 'morhetz/gruvbox'
 Plug 'joshdick/onedark.vim'
 Plug 'jacoborus/tender.vim'
 
+" Plugin to add file type icons to many other plugins. Needs a patched font.
+Plug 'ryanoasis/vim-devicons'
+
 " LSP for NeoVim.
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+
+" Plugin for multi-language debugging
+Plug 'puremourning/vimspector'
 
 " Plugin to use tab for autocompletion.
 Plug 'ervandew/supertab'
@@ -64,11 +71,12 @@ Plug 'mhinz/vim-signify'
 " Plugin to comment text easily.
 Plug 'tpope/vim-commentary'
 
-" Simple motion to jump to next two char block.
-Plug 'justinmk/vim-sneak'
+" Motion plugins
+Plug 'easymotion/vim-easymotion'
+Plug 'ryym/vim-unimpaired'
 
-" Plugin to add file type icons to many other plugins. Needs a patched font.
-Plug 'ryanoasis/vim-devicons'
+" Easy replace text with register using `gr`
+Plug 'vim-scripts/ReplaceWithRegister'
 
 call plug#end()
 
@@ -77,15 +85,17 @@ if plug_install
 endif
 unlet plug_install
 
-" }}}
 
-"------------------------------------------------------------------------------
-" General config {{{
+" General config
+" ==============
 
 syntax on               " Enable syntax highlighting.
 filetype indent on      " Allow indent for know filetypes.
-filetype plugin on      " Allow filespecific plugins
+filetype plugin on      " Allow filespecific plugins.
+set hidden              " Keep unsaved buffers in memory.
 set encoding=UTF-8      " Set encoding to UTF-8.
+set nobackup            " Some language servers have issues with backups.
+set nowritebackup       " Some language servers have issues with backups.
 set wildmenu            " Better command-line completion
 set laststatus=2        " Always display the status line
 set mouse=a             " Enable use of the mouse for all modes
@@ -93,7 +103,6 @@ set ignorecase          " Make searching case insensitive
 set smartcase           " ...unless the query has capital letters
 set visualbell          " Use visual bell instead of beeping
 set autochdir           " Switch to current file's parent directory
-set foldmethod=marker   " Use three { as marker for folds
 set nowrap              " Don't wrap lines
 set updatetime=300      " Improve experience for diagnostic messages
 set shortmess+=c        " Don't give |ins-completion-menu| messages
@@ -109,11 +118,11 @@ set nojoinspaces        " Prevents two spaces after punctuation on a join (J)
 set expandtab           " Insert spaces when TAB is pressed.
 set tabstop=4           " Render TABs using this many spaces.
 set shiftwidth=4        " Indentation amount for < and > commands.
-set tw=79               " Set document width...
-set colorcolumn=80      " ... and mark column 80
+set tw=80               " Set document width...
+set colorcolumn=+1      " ... and mark next column.
 
-if &undolevels < 200
-    set undolevels=200  " Number of undo levels
+if &undolevels < 1000
+    set undolevels=1000 " Number of undo levels
 endif
 
 if !&scrolloff
@@ -122,10 +131,6 @@ endif
 if !&sidescrolloff
   set sidescrolloff=5   " Show next 5 columns while side-scrolling
 endif
-
-" Allows you to switch from an unsaved buffer without saving it first
-" Also allows you to keep an undo history for multiple files
-set hidden
 
 " Makes only the neovim terminal hidden on when not loaded on a split/window
 augroup custom_term
@@ -137,24 +142,36 @@ augroup END
 set backspace=indent,eol,start
 
 " Better copy and paste, use same clipboard outside vim
-set clipboard=unnamed
+set clipboard^=unnamedplus,unnamed
 
-" }}}
+function! SetTextPrefs()
+    setlocal spell
+    setlocal wrap
+    setlocal linebreak
+    setlocal colorcolumn=""
+endfunction
 
-"------------------------------------------------------------------------------
-" Color Scheme configuration {{{
+" Set syntax highlighting for specific file types
+augroup file_syntax
+  autocmd!
+  autocmd BufRead,BufNewFile *.md call SetTextPrefs()
+  autocmd BufRead,BufNewFile gitconfig.local call SetTextPrefs()
+augroup END
 
-" If not on Oni, use theme below
+
+" Color Scheme configuration
+" ==========================
+
 colorscheme gruvbox
 let g:airline_theme='gruvbox'
 set background=dark
 if has('termguicolors')
     set termguicolors
 endif
-" }}}
 
-"------------------------------------------------------------------------------
-" Mappings {{{
+
+" Mappings
+" ========
 
 " Map the leader key to SPACE.
 let mapleader="\<space>"
@@ -166,6 +183,9 @@ nmap ; :
 " which is the default.
 map Y y$
 
+" Redo
+nnoremap U <C-r>
+
 " Map ESC to exit Terminal mode in NeoVim.
 if has('nvim')
     :tnoremap <Esc> <C-\><C-n>
@@ -176,10 +196,11 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Clear search highlight after search.
-nnoremap <C-L> :nohlsearch<CR><C-L>
+nnoremap <leader>d :nohlsearch<CR>
 
-"------------------------------------------------------------------------------
+
 " Navigation mappings
+" ===================
 
 " Move between buffers.
 nmap <Leader>k :bnext<CR>
@@ -208,83 +229,99 @@ nmap <silent><M-j> :wincmd j<CR>
 nmap <silent><M-h> :wincmd h<CR>
 nmap <silent><M-l> :wincmd l<CR>
 
+
+" Plugin specific options
+" =======================
+
 " Auto Pairs
+" ----------
 let g:AutoPairsShortcutFastwrap='<M-e>'
 
 " coc.nvim
+" --------
+
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at
-" current position. Coc does snippet and additional edit on confirm.
-" inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-" Use <leader> + l as baseline command (l for language server)
-nmap <silent> <leader>lE <Plug>(coc-diagnostic-prev)
-nmap <silent> <leader>le <Plug>(coc-diagnostic-next)
-nmap <silent> <leader>ld <Plug>(coc-definition)
-nmap <silent> <leader>ly <Plug>(coc-type-definition)
-nmap <silent> <leader>li <Plug>(coc-implementation)
-nmap <silent> <leader>lr <Plug>(coc-references)
-" Use k as a shorthand to show documentation in preview window
-nnoremap <silent> <leader>lk :call CocActionAsync("doHover")<CR>
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
 " Remap for rename current word
-nmap <leader>lr <Plug>(coc-rename)
-" Remap for do codeAction of current line
-nmap <leader>la  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <leader>lf  <Plug>(coc-fix-current)
+nmap <leader>rn <Plug>(coc-rename)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocActionAsync('doHover')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
+
 " Use `:Fold` to fold current buffer
 command! -nargs=? Fold :call CocAction('fold', <f-args>)
+
 " use `:OR` for organize import of current buffer
 command! -nargs=0 OR   :call CocAction('runCommand', 'editor.action.organizeImport')
 
+" Show all diagnostics.
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+
 " Tagbar
+" ------
 nmap <Leader>t :TagbarToggle<CR>
 
 " NERDTree
+" --------
 map <Leader>n :NERDTreeToggle<CR>
 
 " Ctrl-P
+" ------
 " Open file menu (o for open file)
 nnoremap <Leader>o :CtrlP<CR>
+
 " Open buffer menu
 nnoremap <Leader>b :CtrlPBuffer<CR>
+
 " Open most recently used files (h for history)
 nnoremap <Leader>h :CtrlPMRUFiles<CR>
 
-" nvim-ipy
-let g:nvim_ipy_perform_mappings = 0
-" Use <leader> + r as baseline command
-" Run current line or selection
-map <silent> <leader>r <Plug>(IPy-Run)
-" Run all lines in buffer
-map <silent> <leader>ra <Plug>(IPy-RunAll)
-" Complete command on iPython
-map <silent> <leader>rc <Plug>(IPy-Complete)
-" Send interrupt to kernel
-map <silent> <leader>ri <Plug>(IPy-Interrupt)
-" Terminate kernel
-map <silent> <leader>rt <Plug>(IPy-Terminate)
-
-" }}}
-
-"----------------------------------------------------------------------
-" Plugin specific options {{{
-
-" SuperTab
-" Let SuperTab scroll from top to bottom.
-let g:SuperTabDefaultCompletionType = "<c-n>"
-" close the preview window when you're not using it
-let g:SuperTabClosePreviewOnPopupClose = 1
-
-" Airline
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#ale#enabled = 1
-let g:airline_powerline_fonts = 1
-
-" Ctrl-P
-" Keep persistent cahe file
+" Keep persistent cache file
 let g:ctrlp_clear_cache_on_exit = 1
 let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 " use ag for searching instead of vim's globpath()
@@ -292,15 +329,32 @@ if executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 endif
 
+" SuperTab
+" --------
+" Let SuperTab scroll from top to bottom.
+let g:SuperTabDefaultCompletionType = "<c-n>"
+" close the preview window when you're not using it
+let g:SuperTabClosePreviewOnPopupClose = 1
+
+" Airline
+" -------
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#ale#enabled = 1
+let g:airline_powerline_fonts = 1
+
 " Better-whitespaces
+" ------------------
 let g:strip_whitespace_on_save = 1
 
-" Sneak
-let g:sneak#s_next = 1
-
 " Signify
+" -------
 let g:signify_sign_change = '~'
 let g:signify_sign_delete = '-'
 
-" }}}
-"----------------------------------------------------------------------
+" Unimpaired
+" ----------
+" Disable encodings and '[e' and ']e' for line swap
+let g:unimpaired_mapping = {
+\ 'encodings' : 0,
+\ 'excludes' : { 'lineopes' : ['e']}
+\ }
