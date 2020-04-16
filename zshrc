@@ -42,7 +42,6 @@ export GREP_COLOR='1;31' # green for matches
 ## -----------------------
 ## -- 3) Configure PATH --
 ## -----------------------
-PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!

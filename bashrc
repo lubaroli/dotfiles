@@ -31,5 +31,5 @@ alias md='mkdir'
 alias cl='clear'
 
 # 3.3) grep options
-export GREP_OPTIONS='--color=auto'
-export GREP_COLOR='1;31' # green for matches
+GREP_OPTIONS='--color=auto'
+GREP_COLOR='1;31' # green for matches
