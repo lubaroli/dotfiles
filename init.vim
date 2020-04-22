@@ -196,7 +196,7 @@ vnoremap < <gv
 vnoremap > >gv
 
 " Clear search highlight after search.
-nnoremap <leader>d :nohlsearch<CR>
+nnoremap <leader>l :nohlsearch<CR>
 
 
 " Navigation mappings
