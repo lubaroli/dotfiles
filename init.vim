@@ -1,6 +1,6 @@
 " =============================================================================
 " Author: Lucas Barcelos de Oliveira
-" Last update: 14/04/2020
+" Last update: 17/09/2020
 "
 " My init.vim for Neovim
 " =============================================================================
@@ -77,6 +77,9 @@ Plug 'ryym/vim-unimpaired'
 
 " Easy replace text with register using `gr`
 Plug 'vim-scripts/ReplaceWithRegister'
+
+" Case sensitive search and replace
+Plug 'tpope/vim-abolish'
 
 call plug#end()
 
@@ -207,7 +210,7 @@ nmap <Leader>k :bnext<CR>
 nmap <Leader>j :bprevious<CR>
 
 " Close current buffer/tab.
-nmap <Leader>w :BD!<CR>
+nmap <Leader>q :BD!<CR>
 
 " Relative numbering.
 function! NumberToggle()
@@ -312,14 +315,14 @@ map <Leader>n :NERDTreeToggle<CR>
 
 " Ctrl-P
 " ------
-" Open file menu (o for open file)
-nnoremap <Leader>o :CtrlP<CR>
+" Open file menu (file open)
+nnoremap <Leader>fo :CtrlP<CR>
 
-" Open buffer menu
-nnoremap <Leader>b :CtrlPBuffer<CR>
+" Open most recently used files (file last)
+nnoremap <Leader>fl :CtrlPMRUFiles<CR>
 
-" Open most recently used files (h for history)
-nnoremap <Leader>h :CtrlPMRUFiles<CR>
+" Open buffer menu (find buffer)
+nnoremap <Leader>fb :CtrlPBuffer<CR>
 
 " Keep persistent cache file
 let g:ctrlp_clear_cache_on_exit = 1
