@@ -1,0 +1,7 @@
+Host blinkenlights
+    HostName blinkenlights.cs.usyd.edu.au
+    User lubaroli
+
+Host muspelheim
+    HostName muspelheim.cs.usyd.edu.au
+    User lubaroli
